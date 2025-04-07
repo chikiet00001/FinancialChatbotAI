@@ -9,40 +9,14 @@ use Illuminate\Http\Request;
 
 class ControllerChatbotAI extends Controller
 {
-    //
+    // form chatbot
     public function index(){
         return view('chatbotai.index');
     }
-    // public function register(){
-    //     return view('chatbotai.register');
-    // }
+
     public function demo(){
         return view('chatbotai.demo');
     }
-
-    // public function fetchFastAPI($data)
-    // {
-    //     $response = Http::get('http://localhost:8000/ask');
-
-    //     if ($response->successful()) {
-    //         $data = $response->json();
-    //         // Do something with $data
-    //         return $data;
-    //     } else {
-    //         // Handle error
-    //         return response()->json(['error' => 'FastAPI request failed'], 500);
-    //     }
-    // }
-
-    // public function fetchFastAPI(Request $request)
-    // {
-    //     // Lấy dữ liệu "message" từ frontend
-    // $message = $request->input('message');  // lấy giá trị message từ request
-
-    // // Gửi yêu cầu POST đến FastAPI
-    // $response = Http::timeout(120)->post('http://localhost:8000/ask', [
-    //     'question' => $message,  // Truyền dữ liệu message đến FastAPI
-    // ]);
 
     public function fetchFastAPI(Request $request)
     {
@@ -77,8 +51,6 @@ class ControllerChatbotAI extends Controller
         }
 
         // Nếu không phải AJAX, chuyển sang view (trường hợp khác)
-        return view('chatbotai.login.demo', compact('answer'));
+        return view('chatbotai.index', compact('answer'));
     }
-
-
 }

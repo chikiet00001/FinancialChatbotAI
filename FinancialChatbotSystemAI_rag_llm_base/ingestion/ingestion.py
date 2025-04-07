@@ -1,6 +1,6 @@
 import os
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from ingestion.service_manager import ServiceManager
 from langchain_community.vectorstores import FAISS
 
@@ -34,6 +34,7 @@ class Ingestion:
         # Duyệt qua toàn bộ thư mục và tệp tin
         for root, dirs, files in os.walk(path_input_folder):
             for file in files:
+                print("running...")
                 if file.endswith("txt"):  # Chỉ xử lý tệp văn bản .txt
                     file_path = os.path.join(root, file)  # Lấy đường dẫn đầy đủ của tệp
                     docs = self.process_txt(file_path, self.chunk_size)  # Xử lý tệp
@@ -42,6 +43,7 @@ class Ingestion:
         # Tạo vector store từ các đoạn văn bản đã xử lý
         vectorstore = FAISS.from_documents(all_docs, self.embedding_model)
         vectorstore.save_local(path_vector_store)  # Lưu vector store vào thư mục đích
+        print("end")
 
     def process_txt(self, path_file: str, chunk_size: int):
         """

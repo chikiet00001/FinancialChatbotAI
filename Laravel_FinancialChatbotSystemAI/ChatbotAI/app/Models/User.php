@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable; // Sử dụng Authentic
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 
+//app\Models\User.php
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
