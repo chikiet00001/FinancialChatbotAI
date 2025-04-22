@@ -18,7 +18,7 @@ root/
 ## III. Cấu hình
 
 ### 1. Cơ sở dữ liệu
-- File `Database.sql` chứa cấu trúc và dữ liệu mẫu cho hệ thống.
+- File `financialchatbot.sql` chứa cấu trúc và dữ liệu mẫu cho hệ thống.
 - Chỉ cần import file này vào hệ quản trị cơ sở dữ liệu (MySQL hoặc tương đương) để sử dụng ngay.
 
 ---
