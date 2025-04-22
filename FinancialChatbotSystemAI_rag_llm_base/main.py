@@ -94,6 +94,38 @@ async def check_task(task_id: str):
     else:
         # Trả về trạng thái (True nếu đang hoạt động, False nếu hoàn thành)
         return {"result": status}  # Trả về dưới dạng JSON với trường result
+    
+class LineUpdateRequest(BaseModel):
+    key: str
+    model: str
+
+# Đường dẫn đến file cần thay đổi
+file_path = '.env'
+
+@app.post("/modelai")
+async def modelai(request: LineUpdateRequest):
+    # Đọc nội dung file
+    if not os.path.exists(file_path):
+        return {"error": "File not found"}
+    
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    # Kiểm tra số dòng trong file để tránh lỗi
+    if len(lines) < 4:
+        return {"error": "File không đủ dòng để thay đổi"}
+
+    # Cập nhật dòng 2 và dòng 4
+    lines[1] = f'KEY_API_GPT = "{request.key}"\n'  # Dòng đầu tiên (dòng KEY_API_GPT)
+    lines[3] = f'LLM_NAME = "{request.model}"\n'  # Dòng thứ hai (dòng LLM_NAME)
+
+    # Ghi lại nội dung vào file
+    with open(file_path, 'w') as file:
+        file.writelines(lines)
+
+    return {"message": "File đã được cập nhật"}
+
+
 
 if __name__ == "__main__":
     subprocess.run([venv_path, uvicorn_path, "main:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "2"])

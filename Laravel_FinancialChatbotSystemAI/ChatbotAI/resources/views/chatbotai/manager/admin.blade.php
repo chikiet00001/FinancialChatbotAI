@@ -7,6 +7,19 @@
     <title>Admin - Quản lý Người dùng</title>
     <link rel="stylesheet" href="style.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description"
+        content="Hệ thống chatbot AI hỗ trợ tư vấn tài chính cá nhân, đầu tư và tiết kiệm hiệu quả. Nhanh chóng - Bảo mật - Chính xác.">
+    <meta name="keywords" content="chatbot tài chính, tư vấn đầu tư, tiết kiệm, AI tài chính, trợ lý tài chính ảo">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <meta property="og:title" content="Trợ lý tài chính AI - Chatbot hỗ trợ đầu tư và tiết kiệm">
+    <meta property="og:description"
+        content="Trò chuyện với chatbot tài chính để có lời khuyên đầu tư hiệu quả. Miễn phí, chính xác và thông minh.">
+    <meta property="og:image" content="https://financialchatbot.com/og-image.jpg">
+    <meta property="og:url" content="financialchatbot.com">
+    <meta property="og:type" content="website">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Tổng thể bố cục */
@@ -293,6 +306,30 @@
                 // Gọi hàm checkTaskStatus mỗi 5 giây (5000ms)
                 setInterval(checkTaskStatus, 10000);
             </script>
+        </div>
+
+        <!-- Nút để hiển thị/ẩn hộp -->
+        <button id="toggle-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Cài Đặt Model AI</button>
+
+        <!-- Hộp cài đặt -->
+        <div id="settings-box" class="mt-4 p-4 border rounded shadow-lg" style="display: none;">
+            <h3 class="text-lg font-semibold">Cài Đặt Model AI</h3>
+            <form id="ai-settings-form">
+                <!-- Combobox cho model AI -->
+                <label for="ai-model" class="block mt-2">Chọn Model AI:</label>
+                <select id="ai-model" class="w-full p-2 border rounded">
+                    <option value="openai">ChatGPT</option>
+                    <option value="gemini">Gemini</option>
+                </select>
+
+                <!-- Textbox cho API Key -->
+                <label for="api-key" class="block mt-4">API Key:</label>
+                <input type="text" id="api-key" class="w-full p-2 border rounded" placeholder="Nhập API Key"
+                    required>
+
+                <!-- Nút Cập Nhật -->
+                <button type="submit" class="mt-4 bg-green-500 text-white px-4 py-2 rounded">Cập Nhật</button>
+            </form>
         </div>
 
         <!-- Bảng danh sách User -->
@@ -723,15 +760,80 @@
                 .catch(error => {
                     console.error('Error:', error);
                 });
-            
+
             // Hiển thị thông báo cho người dùng
             alert("Dữ liệu đang được cập nhật!!");
 
             // Dùng setTimeout để trì hoãn việc tải lại trang sau 3 giây (3000 ms)
             setTimeout(function() {
-                location.reload();  // Tải lại trang
-            }, 1500);  // 3000 ms = 3 giây
+                location.reload(); // Tải lại trang
+            }, 1500); // 3000 ms = 3 giây
 
+        });
+
+        // Lấy các phần tử DOM
+        const toggleBtn = document.getElementById('toggle-btn');
+        const settingsBox = document.getElementById('settings-box');
+        const aiSettingsForm = document.getElementById('ai-settings-form');
+
+        // Thêm sự kiện click cho nút toggle để hiển thị/ẩn hộp
+        toggleBtn.addEventListener('click', () => {
+            // Toggling hộp cài đặt
+            if (settingsBox.style.display === 'none' || settingsBox.style.display === '') {
+                settingsBox.style.display = 'block';
+                toggleBtn.textContent = 'Ẩn Hộp Cài Đặt'; // Thay đổi nội dung nút khi hiển thị hộp
+            } else {
+                settingsBox.style.display = 'none';
+                toggleBtn.textContent = 'Hiển thị Hộp Cài Đặt'; // Thay đổi nội dung nút khi ẩn hộp
+            }
+        });
+
+        // Xử lý sự kiện submit form (nút Cập Nhật)
+        document.getElementById("ai-settings-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Ngừng reload trang khi gửi form
+
+            const aiModel = document.getElementById('ai-model').value;
+            const apiKey = document.getElementById('api-key').value;
+
+            // Kiểm tra nếu API Key còn trống
+            if (!apiKey) {
+                alert("Vui lòng nhập API Key.");
+                return;
+            }
+
+            // Tạo object chứa dữ liệu để gửi (thay đổi key và model cho đúng với yêu cầu API)
+            const requestData = {
+                key: apiKey, // Thay 'aiKey' thành 'key'
+                model: aiModel // Thay 'aiModel' thành 'model'
+            };
+
+            // Gửi dữ liệu bằng fetch
+            fetch('http://localhost:8000/modelai', {
+                    method: 'POST', // Phương thức POST để gửi dữ liệu
+                    headers: {
+                        'Content-Type': 'application/json', // Đảm bảo gửi đúng kiểu dữ liệu
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content') // CSRF Token nếu cần
+                    },
+                    body: JSON.stringify(requestData) // Chuyển đối tượng thành chuỗi JSON
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw new Error(error.message)
+                        });
+                    }
+                    return response.json(); // Chuyển đổi phản hồi thành JSON
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    alert("Cập nhật thành công!");
+                    // Bạn có thể thêm mã xử lý sau khi cập nhật thành công (ví dụ ẩn form hoặc làm gì đó khác)
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert("Đã xảy ra lỗi khi cập nhật.");
+                });
         });
     </script>
 </body>
